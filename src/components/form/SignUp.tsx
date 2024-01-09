@@ -1,64 +1,76 @@
-import { ChangeEvent, FormEvent, useState } from "react";
 import Typo from "../Typo";
 import Button from "../button/Button";
 import CustomInput from "../input/CustomInput";
 
-interface FormData {
+import { useForm, Resolver } from "react-hook-form";
+
+type FormValues = {
   username: string;
   email: string;
   password: string;
-}
+};
+const resolver: Resolver<FormValues> = async (values) => {
+  return {
+    values: values,
+    errors: {
+      ...(values.username
+        ? {}
+        : {
+            username: {
+              type: "required",
+              message: "Username is required",
+            },
+          }),
+      ...(values.email
+        ? {}
+        : {
+            email: {
+              type: "required",
+              message: "Email is required",
+            },
+          }),
+      ...(values.password
+        ? {}
+        : {
+            password: {
+              type: "required",
+              message: "Password is required",
+            },
+          }),
+    },
+  };
+};
+
 const SignUp = () => {
-  const [formData, setFormData] = useState<FormData>({
-    username: "",
-    email: "",
-    password: "",
-  });
-  const { username, email, password } = formData;
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    alert(`Welcome ... ${username}`);
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({ resolver });
+  const onSubmit = handleSubmit((data) => console.log(data));
   return (
     <form
-      className="py-5 px-5 w-[500px] border shadow-2xl rounded-xl "
-      onSubmit={handleSubmit}
+      className="py-5 px-5 w-[500px] border shadow-2xl rounded-xl"
+      onSubmit={onSubmit}
     >
-      <Typo className="text-center mt-5 text-2xl font-bold tracking-wider uppercase text-sky-600">
-        Sign up
+      <Typo className="text-2xl font-bold text-sky-600 text-center">
+        Sign Up
       </Typo>
       <CustomInput
+        label="Username"
         type="text"
-        name="username"
-        placeholder="Enter your username..."
-        value={username}
-        onChange={handleChange}
-      >
-        Username
-      </CustomInput>
+        register={register("username")}
+      />
+
+      <CustomInput label="Email" type="email" register={register("email")} />
       <CustomInput
-        type="email"
-        name="email"
-        placeholder="Enter your email..."
-        value={email}
-        onChange={handleChange}
-      >
-        Email
-      </CustomInput>
-      <CustomInput
+        label="Password"
         type="password"
-        name="password"
-        placeholder="Enter your password..."
-        value={password}
-        onChange={handleChange}
-      >
-        Password
-      </CustomInput>
-      <Button className="w-full tracking-wider">Sign up</Button>
+        register={register("password")}
+      />
+      <Button className="w-full tracking-wider" type="submit">
+        Sign up
+      </Button>
     </form>
   );
 };
