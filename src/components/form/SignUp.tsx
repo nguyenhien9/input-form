@@ -2,56 +2,23 @@ import Typo from "../Typo";
 import Button from "../button/Button";
 import CustomInput from "../input/CustomInput";
 
-import { useForm, Resolver } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 
 type FormValues = {
   username: string;
   email: string;
   password: string;
 };
-const resolver: Resolver<FormValues> = async (values) => {
-  return {
-    values: values,
-    errors: {
-      ...(values.username
-        ? {}
-        : {
-            username: {
-              type: "required",
-              message: "Username is required",
-            },
-          }),
-      ...(values.email
-        ? {}
-        : {
-            email: {
-              type: "required",
-              message: "Email is required",
-            },
-          }),
-      ...(values.password
-        ? {}
-        : {
-            password: {
-              type: "required",
-              message: "Password is required",
-            },
-          }),
-    },
-  };
-};
 
 const SignUp = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormValues>({ resolver });
-  const onSubmit = handleSubmit((data) => console.log(data));
+  const { register, handleSubmit } = useForm<FormValues>();
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
+    console.log(data);
+  };
   return (
     <form
       className="py-5 px-5 w-[500px] border shadow-2xl rounded-xl"
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <Typo className="text-2xl font-bold text-sky-600 text-center">
         Sign Up
